@@ -373,5 +373,95 @@ Puis on va l'appeller dans nos pages
 **``Attention :``** Lorsque l'on recherche une image dans un fichier jsx, on commence notre arborescence à la racine du dossier ``public``
 
 ## Les hooks
+Les Hooks sont une nouveauté de React 16.8. Ils permettent de bénéficier d’un état local et d’autres fonctionnalités de React sans avoir à écrire de classes.
 
+Pour la demo, on va créer un composant ``country`` que l'on va afficher sur la home
+```jsx
+import React, {Fragment} from 'react';
 
+const Countries = () => {
+    return (
+        <Fragment>
+            <div className="countries">
+                <h1>pays</h1>
+            </div>
+        </Fragment>
+    );
+};
+
+export default Countries;
+```
+
+Ensuite, pour l'exemple, on va créer une constante pour gerer nos données grace au ``state``
+```jsx
+const [data, setData] = useState("hello")
+```
+Cette variable posséde un nom (ici *data*) et un deuxieme éléments qui est l'élément par lequel on passera pour modifier nos données</br>
+Maintenant, si dans notre composant on affiche ***data***, il va nous afficher la valeur stocker dans notre constance
+```jsx
+<Fragment>
+    <div className="countries">
+        <h1>{data}</h1>
+    </div>
+</Fragment>
+```
+resultat:
+![data-hello](/img-readme/data.PNG)
+
+---
+
+Sur Google chrome, on peut utiliser le pluggin ***``React Developer Tools``*** pour avoir des information sur notre projet react
+
+![Pluggin Chrome](/img-readme/googlePluggin.PNG)
+
+---
+
+Cette variable data, on peut la faire évoluer en utilisant notre ``setData``, pour cela, on peut créer une fonction:
+```jsx
+const sayGoodBye = () =>{
+    setData("GoodBye");
+}
+```
+et pour l'appeller, on va créer un bouton, lorsque l'on va cliquer dessus, il changera l'etat de notre constante data
+```jsx
+<button onClick={sayGoodBye}>Dire au revoir</button>
+```
+## L'api restcountries
+
+[Liste des pays](https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag)
+
+Pour aller chercher les donner avec react, on va installer un nouvelle bibliotheque de react, ``axios`` qui va nous permettre de faire un fetch.
+```shell
+npm i -s axios
+```
+Gràce a cette bibliotheque, on peut recuperer les donner de notre api, et grace a notre ``setData``, inserer dans notre data, la reponse obtenue
+```jsx
+axios.get(
+        'https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag'
+    ).then((res) => setData(res.data))
+```
+### Le useEffect
+**Que fait useEffect ?** On utilise ce Hook pour indiquer à React que notre composant doit exécuter quelque chose après chaque affichage. React enregistre la fonction passée en argument (que nous appellerons « effet »), et l’appellera plus tard, après avoir mis à jour le DOM. 
+
+```jsx
+useEffect(() => {
+    axios.get(
+        'https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag'
+    ).then((res) => setData(res.data))
+}, [])
+```
+Puis, on peut donc l'afficher dans notre composant
+```jsx
+<Fragment>
+    <div className="countries">
+        <ul className="countries-list">
+            {data.map((country) => {
+                <li>
+                    {country.name}
+                </li>
+            })}
+        </ul>
+    </div>
+</Fragment>
+```
+## Les props
