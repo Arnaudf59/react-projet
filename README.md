@@ -26,7 +26,7 @@ npm run build
 ```
 
 ## Structure d'un fichier react - Le composant basique
-![composant basique](/img-readme/composantbasique.PNG)
+![composant basique](/img-readme/composantBasique.PNG)
 
 Tous les composant se resemble, il sont composé comme ceci:
 - D'abord, il y a l'import de toutes nos bibliothéques
@@ -106,7 +106,7 @@ function App() {
 export default App;
 ```
 resultat:
-![Hello React](./img-readme/helloreact.PNG)
+![Hello React](./img-readme/helloReact.PNG)
  ## Création de notre première page
 Dans un dossier ``pages``, on va créer notre page Home -> ``Home.jsx``.
 
