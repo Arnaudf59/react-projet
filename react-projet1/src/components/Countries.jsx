@@ -7,7 +7,7 @@ const Countries = () => {
 
     useEffect(() => {
         axios.get(
-            'https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag'
+            'https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148'
         ).then((res) => setData(res.data)) 
     }, [])
     

@@ -24,7 +24,6 @@ Pour compiler un projet react, on utilise la commande
 ```shell
 npm run build
 ```
-
 ## Structure d'un fichier react - Le composant basique
 ![composant basique](/img-readme/composantBasique.PNG)
 
@@ -42,7 +41,6 @@ npm i -save react-dom react-router-dom node-sass@4.14.1
 - ``react-dom``: Le module react-dom fournit des méthodes spécifiques au DOM que vous pouvez utiliser au niveau racine de votre appli et comme échappatoire pour travailler hors du modèle React si vous en avez besoin.
 - ``react-router-dom``: React Router est une extension a React qui permet de gérer les routes d'une application coté client. Il permet de synchroniser (d'associer) des composants graphiques React à des urls.
 - ``node-sass@4.14.1``(@numéro de la version, permet de choisir la version à installer):Le langage SASS est un préprocesseur CSS capable de gérer vos projets CSS en générant des feuilles de styles (fichier . css). Le CSS3, est un langage en soi que les navigateurs interprètent.
-
 ## Explication d'un projet react
 Un projet react, et de 3 gros dossier:
 - Les ``node_modules``: c'est l'ensemble des bibliothéque utiliser dans notre projet
@@ -57,7 +55,6 @@ Toute notre application est contenu dans le body, dans la div d'id root
 - Et enfin, le fichier ``src``: On va y trouver nos fichier css, nos composant, nos pages, nos fichiers ***index.js*** 
 
 L'index.js est le fichier par lequelle on a accès dans notre appli. il est le fichier qui dans la balise d'id ``root`` va placer notre composant ``App``
-
 ## Création d'un composant la bonne pratique
 Supprimer app.js, app.css, app.html dans index .js retirer l'import à app puis créer un dossier **composant** et créer un fichier ***App.jsx***
 ```jsx
@@ -94,7 +91,7 @@ const App = () => {
 Cette balise n'apparaitra pas dans le navigateur.
 ## Test de fonctionnement
 
-Dans le fichier App; js, on peut supprimer tout le rendu et y mettre:
+Dans le fichier App.js, on peut supprimer tout le rendu et y mettre:
 ```jsx
 function App() {
   return (
@@ -105,7 +102,7 @@ function App() {
 }
 export default App;
 ```
-resultat:
+resultat:</br>
 ![Hello React](./img-readme/helloReact.PNG)
  ## Création de notre première page
 Dans un dossier ``pages``, on va créer notre page Home -> ``Home.jsx``.
@@ -405,7 +402,7 @@ Maintenant, si dans notre composant on affiche ***data***, il va nous afficher l
     </div>
 </Fragment>
 ```
-resultat:
+resultat:</br>
 ![data-hello](/img-readme/data.PNG)
 
 ---
@@ -428,7 +425,7 @@ et pour l'appeller, on va créer un bouton, lorsque l'on va cliquer dessus, il c
 ```
 ## L'api restcountries
 
-[Liste des pays](https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag)
+[Liste des pays](https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148)
 
 Pour aller chercher les donner avec react, on va installer un nouvelle bibliotheque de react, ``axios`` qui va nous permettre de faire un fetch.
 ```shell
@@ -437,7 +434,7 @@ npm i -s axios
 Gràce a cette bibliotheque, on peut recuperer les donner de notre api, et grace a notre ``setData``, inserer dans notre data, la reponse obtenue
 ```jsx
 axios.get(
-        'https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag'
+        'https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148'
     ).then((res) => setData(res.data))
 ```
 ### Le useEffect
@@ -446,7 +443,9 @@ axios.get(
 ```jsx
 useEffect(() => {
     axios.get(
-        'https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag'
+        //'https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag'
+        'https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148'
+
     ).then((res) => setData(res.data))
 }, [])
 ```
@@ -463,5 +462,16 @@ Puis, on peut donc l'afficher dans notre composant
         </ul>
     </div>
 </Fragment>
+```
+#### Rappel .map() Javascript
+La méthode **``map()``** crée un nouveau tableau avec les résultats de l'appel d'une fonction fournie sur chaque élément du tableau appelant.
+```js
+const array1 = [1, 4, 9, 16];
+
+// pass a function to map
+const map1 = array1.map(x => x * 2);
+
+console.log(map1);
+// expected output: Array [2, 8, 18, 32]
 ```
 ## Les props
