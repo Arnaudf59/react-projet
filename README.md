@@ -578,7 +578,7 @@ Pour pallier a ce problème, on va dire a notre useEffect de s'utiliser lorsque 
 ```jsx
 useEffect(() => {
     axios.get(
-        'https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148'
+        'https://api.countrylayer.com/v2/all?access_key=API_KEY'
     ).then((res) => setData(res.data)) 
     const sortedCountry = () => {
         const countryObj = Object.keys(data).map((i) => data[i]);
@@ -600,7 +600,7 @@ Puis on modifie notre useEffect pour retirer notre boucle infinie
 ```jsx
 if(playOnce) {
     axios.get(
-        'https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148'
+        'https://api.countrylayer.com/v2/all?access_key=API_KEY'
     ).then((res) => {
         setData(res.data);
         setPalayOnce(false)
@@ -665,3 +665,42 @@ useEffect(() => {
 }, [data, rangeValue, playOnce])
 ```
 ## Input Radio
+Pour l'exemple des boutons radio, on va faire un trie des pays par continent.
+
+On va d'abord créer nos boutons radio, pour cela, au lieu de créer 5 boutons radio en html et d'avoir du code répétitif, on va créer un tableau pour pouvoir le mappé et ainsi créer un bouton radio pour chaque entrée du tableau
+```jsx
+const [selectedRadio, setSelectedRadio] = useState('');
+const radios = ["Afrique", "Amérique", "Asie", "Europe", "Océanie"]
+```
+Une premier constante pour savoir si notre bouton est selectionnée, ou non, et une deuxieme constantes qui est notre tableau de continant. 
+
+Ensuite, on va mappé notre tableau pour créer nos bouton
+```jsx
+<ul>
+    {radios.map((radio) => {
+        return(
+            <li key={radio}>
+                <input type="radio" value={radio} id={radio} checked={radio == selectedRadio} onChange={(e) => setSelectedRadio(e.target.value)}/>
+                <label htmlFor={radio}>{radio}</label>
+            </li>
+        )
+    })}
+</ul>
+```
+Ici, pour chaque continent, on créait un bouton radio qui a pour valeur et id le nom du contionent, l'attribut ``checked`` qui permet de voir si le bouton est selectionner grace à la variable selectedRadio, *``checked={radio == selectedRadio}``*, et un fonction onChange pour mettre à jour le bouton selectionner *``onChange={(e) => setSelectedRadio(e.target.value)}``*
+
+Il ne restent plus qu'à faire un bouton pour annuler la recherche selectionner
+```jsx
+<div className="cancel">
+    <h5 onClick={() => setSelectedRadio("")}>Annuler recherche</h5>
+</div>
+```
+Il est posssible d'afficher ce bouton uniquement si un bouton radio à était séléctionné, pour cela, on dispose de la variable ``selectedRadio``. 
+
+En React, on peut ecrire ça comme cela:
+```jsx
+<div className="cancel">
+    {selectedRadio && <h5 onClick={() => setSelectedRadio("")}>Annuler recherche</h5>}
+</div>
+```
+Cela correspond à Si selectedRadio est ``Vrai``, alors on affiche le **``<h5>``**
