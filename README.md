@@ -443,9 +443,7 @@ axios.get(
 ```jsx
 useEffect(() => {
     axios.get(
-        //'https://restcountries.eu/rest/v2/all?fields=name;population;region;capital;flag'
-        'https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148'
-
+    'https://api.countrylayer.com/v2/all?access_key=APY_KEY'
     ).then((res) => setData(res.data))
 }, [])
 ```
@@ -475,3 +473,195 @@ console.log(map1);
 // expected output: Array [2, 8, 18, 32]
 ```
 ## Les props
+Après avoir récupéré les données avec l'api, on va maintenant créer un composant qui va récupérer de ``Countries.jsx`` c'est données pour les afficher.
+
+Une fois ce comosant créer, on va devoir l'importer pour pouvoir l'utiliser dans countries
+```jsx
+import Card from './Card';
+```
+```jsx
+<Fragment>
+    <div className="countries">
+        <ul className="countries-list">
+            {data.map((country) => {
+                <li>
+                    <Card />
+                </li>
+            })}
+        </ul>
+    </div>
+</Fragment>
+```
+Ensuite, dans notre composant Cards, on va maintenant lui passer nos données, pour cela, on va créer une **``props``** dans le composant ``Countries`` et pour lui passer notre variable dans le composant ``Cars``;
+```jsx
+<ul className="countries-list">
+    {data.map((country) => {
+        <li>
+            <Cards country={country}/>
+        </li>
+    })}
+</ul>
+```
+et Dans cars, pour les recupérer:
+```jsx
+const Cards = (props) => {
+
+    console.log(props);
+}
+```
+Attention, en React, il faut mettre une clé unique au props pour les différencier
+```jsx
+<Cards country={country} key={country.name}/>
+```
+**Le destructuring:**
+
+ En javascript, et notamment en react, on peut facilité l'appel des props.
+
+En effet, au lieu de toujours faire:
+```jsx
+props.country.name
+``` 
+Et de toujours devoir mettre le mots ``props``, on peut **``Destructurer``** notre variable pour ne pas l'écrire
+```jsx
+const { country } = props;
+```
+Grace à cette methode, on peut acceder au donnée directement:
+```jsx
+<Fragment>
+    <li className="cards">
+        <img src={country.flag} alt="flag" />
+        <div className="data-container">
+            <ul>
+                <li>{country.name}</li>
+                <li>{country.capital}</li>
+                <li>Pop. {country.population}</li>
+            </ul>
+        </div>
+    </li>
+</Fragment>
+```
+Après avoir fait le style ect.., on va maintenant créer une fonction pour séparrer les milliers et avoir un affichage du nombres de population plus claire
+
+Dans ``Cards.jsx``:
+```jsx
+const numberFormat = (x) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+```
+Puis, dans notre création de card, on peut l'appeler pour avoir un nombre bien structurer
+```jsx
+<ul>
+    <li>{country.name}</li>
+    <li>{country.capital}</li>
+    <li>Pop. {numberFormat(country.population)}</li>
+</ul>
+```
+## Trier les données & Input range
+### Trier les données
+On va d'abord trier nos pays par ordre de population, pour cela on va d'abord créer une variable qui récupérera nos pays trier
+```jsx
+const [sortedData, setSortedData] = useState([]);
+```
+Dans le useEffect, on va se créer une fonction pour trier nos pays, pour cela, il va falloir transformer notre data en objet pour pouvoir utiliser la fonction ``sort()`` pour trier nos pays et ensuite modifier notre variable ``sortedData`` pour récupérer nos pays trier
+```jsx
+const sortedCountry = () => {
+    const countryObj = Object.keys(data).map((i) => data[i]);
+    const sortedArray = countryObj.sort((a,b) => {
+        return b.population - a.population
+    });
+    setSortedData(sortedArray)
+}
+```
+Nous pouvons remarquer un problème, en effet, comme **le javascript est un language asynchrone**, notre objet est vide. Car, on utilise notre fonction avant que notre data ne soit remplie.
+
+Pour pallier a ce problème, on va dire a notre useEffect de s'utiliser lorsque data et mis à jours
+```jsx
+useEffect(() => {
+    axios.get(
+        'https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148'
+    ).then((res) => setData(res.data)) 
+    const sortedCountry = () => {
+        const countryObj = Object.keys(data).map((i) => data[i]);
+        const sortedArray = countryObj.sort((a,b) => {
+            return b.population - a.population
+        });
+        setSortedData(sortedArray)
+    }
+    sortedCountry();
+}, [data])
+```
+Deuxieme erreur, comme a chaque utilisation du useEffect, on actualise data, cela créer une boucle infinie. Pour empécher cela, il faut executer ***le fetch*** qu'une seule fois.
+
+On va donc créer une nouvelle variable qui sera un *Boolean* et qui nous permettra de savoir si oui on non, le fetch a deejà etait utilisé
+```jsx
+const [playOnce, setPalayOnce] = useState(true);
+```
+Puis on modifie notre useEffect pour retirer notre boucle infinie
+```jsx
+if(playOnce) {
+    axios.get(
+        'https://api.countrylayer.com/v2/all?access_key=0b61456a39c2d96e9af0e3dfdf6c1148'
+    ).then((res) => {
+        setData(res.data);
+        setPalayOnce(false)
+    }) 
+}
+```
+Enfin, pour avoir les pays trier, il faut modifier l'envoi des props vers notre conposant card
+```jsx
+ <ul className="countries-list">
+    {sortedData.map((country) => {
+        <li>
+            <Cards country={country} key={country.name}/>
+        </li>
+    })}
+</ul>
+```
+### Les input range
+Maintenant, on créer notre imput pour permettre de choisir le nombre de pays que l'on veux afficher. 
+
+D'abbord on va créer un variable pour mettre une valaur par default du nombre de pays que l'on veut, ici pour l'exemple, on affiche 40 pays
+```jsx
+const [rangeValue, setRangeValue] = useState(40);
+```
+Puis dans notre fonction on va dire, le nombre de sortie du tableau pays que l'on doit recuperer
+```jsx
+onst sortedCountry = () => {
+    const countryObj = Object.keys(data).map((i) => data[i]);
+    const sortedArray = countryObj.sort((a,b) => {
+        return b.population - a.population
+    });
+    // On lui dit que la taille de notre tableau et de la valeur de 'rangeValue'
+    sortedArray.lenght = rangeValue;
+    setSortedData(sortedArray)
+}
+```
+Ensuite, on va créer notre ``input range``:
+```jsx
+<Fragment>
+    <div className="countries">
+        <div className="sort-container">
+            <input type="range" min="1" max="250" value={rangeValue} />
+        </div>
+        <ul className="countries-list">
+            {sortedData.map((country) => {
+                <li>
+                    <Cards country={country} key={country.name}/>
+                </li>
+            })}
+        </ul>
+    </div>
+</Fragment>
+```
+Pour changer la valeur de ``rangeValue``, in faut utiliser *l'event* ***onChange*** et la fonction ***setRangeValue*** pour mettre à jour notre variable
+```jsx
+<input type="range" min="1" max="250" value={rangeValue} onChange={(e) => setRangeValue(e.target.value)} />
+```
+et on oublie pas de relancer le useEffect à chaque modification de la valeur ``rangeValue``
+```jsx
+useEffect(() => {
+    // Code du useEffect
+    ...
+}, [data, rangeValue, playOnce])
+```
+## Input Radio
