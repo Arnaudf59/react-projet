@@ -704,3 +704,142 @@ En React, on peut ecrire ça comme cela:
 </div>
 ```
 Cela correspond à Si selectedRadio est ``Vrai``, alors on affiche le **``<h5>``**
+
+## Page News
+On va d'abord créer une page ``News``, pour faciliter la saisie du *jsx*, il existe un module VScode qui s'appelle Mithril Emmet. Pour l'utiliser, il faut modifier le fichier **``settings.json``** (cliquer sur F1 et le rechercher) et rajouter le code
+```json
+"emmet.includelanguages": {
+    "javascript": "javascriptreact"
+},
+"emmet.triggerExpansionOnTab": true,
+```
+Après avoir créer notre page, on va aller dans le composant app pour lui rajouter une route
+```jsx
+<Route path="/news" exact component={News} />
+```
+puis on le rajoute aussi dans le ``Navigatuon.jsx`` pour bouger directement du projet.
+
+Et on va rajouter les composants, ``Navigation`` et ``Logo`` pour permettre la navigation et l'entête de notre page.
+```jsx
+<Fragment>
+    <div className="news-container">
+        <Navigation />
+        <Logo />
+        <h1>News</h1>
+    </div>    
+</Fragment>
+```
+### Le formulaire
+
+On va créer notre formulaire en html classique
+```jsx
+<form>
+    <input type="text" placeholder="Nom" />
+    <textarea placeholder="Message"></textarea>
+    <input type="submit" value="Envoyer" />
+</form>
+```
+
+### Json-server
+
+[Télécharger le fichier db.json](./react-projet1/src/assets/db.json)
+
+dans un terminal,installer json-server:
+```shell
+npm install -g json-server 
+```
+
+Json server nous permet simuler un back, pour le lancer, il faut le lancer et lui donner le fichier json à utiliser:
+```shell
+json-server --w src/assets/db.json --port 3003
+```
+- json-server: on demander à la dépendance json-server
+- --w: watch (surveiller)
+- src/assets/db.json: le fichier à surveiller
+- --port 3003: le port utiliser
+
+Au lieu de devoir saisir tout le temps cette ligne, on peut créer un script dans les ``package.json`` pour le lancer plus simplement:
+```json
+"server": "json-server --w src/assets/db.json --port 3003"
+```
+Du coup, maintenant dans le terminal, on peut saisir cette commande pour lancer le server:
+```shell
+npm run server
+``` 
+### Récupérer et afficher nos données
+#### Récupérer les données
+Pour cela, on va une nouvelle fois utiliser ``axios``, et pointer l'url vers notre serveur json
+```jsx
+const getData = () => {
+    axios.get('http://localhost:3003/articles').then((res) => console.log(res));
+}
+```
+Pour appeler correctement notre fonction, on va utiliser le **``useEffect``** pour l'appeler quand on arrive sur la page
+```jsx
+useEffect(() => {
+    getData();
+}, []);
+```
+Pour recupérer la reponse de ce get, on va utiliser un useState, pour créer une variable et ainsi récupérer nos articles
+```jsx
+const [newsData, setNewsData] = useState([])
+```
+et dans notre fonction ``getData()``, on va utiliser notre **setNewsData** pour actualiser notre variavle **newsData**:
+```jsx
+const getData = () => {
+    axios.get('http://localhost:3003/articles').then((res) => setNewsData(res.data));
+}
+```
+#### Afficher les données
+Pour récupérer nos articles, on va d'abords créer un composant ``Articles`` basique pour le moment:
+```jsx
+import React, {Fragment} from 'react';
+
+const Articles = () => {
+    return (
+        <Fragment>
+            <h2>
+                Articles
+            </h2>
+        </Fragment>
+    );
+};
+
+export default Articles;
+```
+Et comme pour les pays précédement, on va faire un ``.map()`` pour afficher notre compossant 
+```jsx
+<ul>
+    {newsData.map((article) => (
+        <Articles key={article.id}/>
+    ))}
+</ul>
+```
+Résultat:
+![Affichage des articles](./img-readme/articles.PNG)
+
+Ensuite, il va falloir envoyer les données de News vers Article avec les props pour récupérer les données dans le bon composant
+```jsx
+{newsData.map((article) => (
+    <Articles key={article.id} article={article}/>
+))}
+```
+Puis dans le composant article on peut les récupérer, et on peut le destructurer directement pour recupérer directeùment les article sans devoir mettre props.article a chaque fois
+```jsx
+const Articles = ({ article }) => {
+
+    console.log(article) 
+
+    return (
+        <Fragment>
+            <h2>
+                Articles
+            </h2>
+        </Fragment>
+    );
+};
+```
+### Création de notre composant Articles
+
+
+
