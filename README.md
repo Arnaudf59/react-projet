@@ -839,7 +839,51 @@ const Articles = ({ article }) => {
     );
 };
 ```
-### Création de notre composant Articles
+Grace au props, on peut maintenant utiliser nos données dans le composant Artocles pour les afficher
+```jsx
+<Fragment>
+    <div className="articles">
+        <div className="card-header">
+            <h3>{article.author}</h3>
+            <em>Posté le {article.date}</em>
+        </div>
+        <p>{article.content}</p>
+        <div className="btn-container">
+            <button>Modifier</button>
+            <button>Supprimer</button>
+        </div>
+    </div>
+</Fragment>
+```
+##### Formatage d la date
+Fonction classique pour modifier la date:
+```js
+const dateParser = (date) => {
+        let newDate = new Date(date).toLocaleDateString('fr-FR')
+        return newDate;
+    }
+```
+Resultat:</br>
+![Date format 1](./img-readme/Date1.PNG)
+
+On peut aussi transformer cette fonction en objet et lui donner des arguments pour modifier l'affichage:
+```js
+const dateParser = (date) => {
+    let newDate = new Date(date).toLocaleDateString('fr-FR', {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+    })
+    return newDate;
+}
+```
+Resultat:</br>
+![Format date 2](./img-readme/Date2.PNG)
+
+### Création d'un article
+
 
 
 
