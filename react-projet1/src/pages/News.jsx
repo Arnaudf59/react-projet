@@ -6,7 +6,10 @@ import Articles from '../components/Articles';
 
 const News = () => {
 
-    const [newsData, setNewsData] = useState([])
+    const [newsData, setNewsData] = useState([]);
+    const [author, setAuthor] = useState("");
+    const [content, setContent] = useState("");
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         getData();
@@ -16,15 +19,45 @@ const News = () => {
         axios.get('http://localhost:3003/articles').then((res) => setNewsData(res.data));
     }
 
+    const handleSubmit = (e) => {
+
+        if(content.length < 140){
+            setError(true);
+        }else{
+            axios.post("http://localhost:3003/articles", {
+                author: author,
+                content: content,
+                date: Date.now()
+            }).then(() => {
+                setAuthor("");
+                setContent("");
+                setError(false)
+                getData();
+            });
+        }   
+
+        e.preventDefault();
+    }
+
     return (
         <Fragment>
             <div className="news-container">
                 <Navigation />
                 <Logo />
                 <h1>News</h1>
-                <form>
-                    <input type="text" placeholder="Nom" />
-                    <textarea placeholder="Message"></textarea>
+                <form onSubmit={handleSubmit}>
+                    <input 
+                        type="text" 
+                        placeholder="Nom" 
+                        onChange={(e) => setAuthor(e.target.value)} value={author}
+                    />
+                    <textarea
+                        style={{border: error ? "1px solid red" : "1px solid #61dafb"}} 
+                        placeholder="Message" 
+                        onChange={(e) => setContent(e.target.value)} value={content}
+                    >
+                    </textarea>
+                    {error && <p>Veuillez écrire un minimun de 140 caractères</p>}
                     <input type="submit" value="Envoyer" />
                 </form>
                 <ul>

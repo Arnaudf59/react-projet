@@ -855,7 +855,8 @@ Grace au props, on peut maintenant utiliser nos données dans le composant Artoc
     </div>
 </Fragment>
 ```
-##### Formatage d la date
+---
+#### Formatage de la date
 Fonction classique pour modifier la date:
 ```js
 const dateParser = (date) => {
@@ -882,7 +883,150 @@ const dateParser = (date) => {
 Resultat:</br>
 ![Format date 2](./img-readme/Date2.PNG)
 
+---
 ### Création d'un article
+Pour créer un article, on va d'abord devoir jouer avec le ``submit du formulaire``. 
+
+Lorsque l'on envoi notre formulaire, on peut activé une fonction pour sauvegarder nos données grâce à l'événement ``onSubmit``
+```jsx
+<form onSubmit={handleSubmit}>
+```
+```jsx
+const handleSubmit = () => {
+    console.log('ok');
+}
+```
+Attention, comme Javascript et un language asynchrone et surtout multi-traide, il ne faut pas oublie de mettre le ``preventDefault()`` pour éviter un rechargement de page.
+```jsx
+const handleSubmit = (e) => {
+    console.log("ok");
+    e.preventDefault();
+}
+```
+#### Axios: la methode post
+Après avoir vu le ``get`` avec axios, on va maintenant voir la methode ``post`` pour envoyer des données vers notre base:
+```jsx
+axios.post("http://localhost:3003/articles", {
+    author: "Denis",
+    content: "test",
+    date: Date.now()
+});
+```
+Ici, on envoi des données static a notre base lorsque l'on envoi notre formulaire.
+
+Maintenant, on va récupérer les données de notre formulaire pour les envoyer à notre base. 
+
+Pour cela, on va construire des constantes pour récupérer nos valeurs.
+```jsx
+const [author, setAuthor] = useState("");
+const [content, setContent] = useState("");
+```
+Et pour modifier sa valeur, on vas mettre un evenement sur notre input pour voir les changements.
+```jsx
+<input type="text" placeholder="Nom" onChange={(e) => setAuthor(e.target.value)}/>
+<textarea placeholder="Message" onChange={(e) => setContent(e.target.value)}></textarea>
+```
+Maintenant que l'on dispose de variavle contenant le champs de nos formulaire, on va pouvoir les utiliser pour les envoyer dans notre base
+```jsx
+axios.post("http://localhost:3003/articles", {
+    author: author,
+    content: content,
+    date: Date.now()
+});
+```
+Après avoir envoyer les données, on va rendre notre formulaire plus optimiser
+
+### Optimisation du formulaire
+#### 1. Remettre les champs vide
+Après l'envoi de nos données, on va vider notre formulaire pour le rendre réutilisable directement pour l'utilisateur.
+
+Pour cela,on va d'abord remettre les valeurs à zéro.
+```jsx
+axios.post("http://localhost:3003/articles", {
+    author: author,
+    content: content,
+    date: Date.now()
+}).then(() => {
+    setAuthor("");
+    setContent("");
+});
+```
+Puis, on va dire que nos imput on pour valeur les constantes respective
+```jsx
+<input type="text" placeholder="Nom" onChange={(e) => setAuthor(e.target.value)} value={author}/>
+<textarea placeholder="Message" onChange={(e) => setContent(e.target.value)} value={content}></textarea>
+```
+#### 2. Mettre a jour le fil d'actualité
+Pour mettre à jour notre affichage, rien de plus facile. 
+
+On va juste utiliser notre fonction ``getData()`` après notre post pour injecter dans nos données le nouvelles élément
+```jsx
+axios.post("http://localhost:3003/articles", {
+    author: author,
+    content: content,
+    date: Date.now()
+}).then(() => {
+    setAuthor("");
+    setContent("");
+    getData();
+});
+```
+#### 3. Gestion des erreurs
+Pour l'exemple, on va prendre pour regle le fait que le texte dé l'article dois impérativement faire 140 carractères. 
+
+Pour cela, on va créer une constante ``error`` pour savoir si après notre controle,  on a une erreur ou pas.
+```jsx
+const [error, setError] = useState(false);
+```
+Puis, on controle si on a atteint notre nombre de caractère
+```jsx
+const handleSubmit = (e) => {
+    if(content.length < 140){
+       setError(true);
+    }else{
+        axios.post("http://localhost:3003/articles", {
+            author: author,
+            content: content,
+            date: Date.now()
+        }).then(() => {
+            setAuthor("");
+            setContent("");
+            getData();
+        });
+    }   
+    e.preventDefault();
+}
+```
+Puis on modifie notre textarea pour indiqué à l'utilisateur qu'il y a une erreur, pour cela, on va utiliser l'attribut **``style``** avec un ternaire
+```jsx
+<textarea
+    style={{border: error ? "1px solid red" : "1px solid #61dafb"}} 
+    placeholder="Message" 
+    onChange={(e) => setContent(e.target.value)} value={content}
+>
+</textarea>
+```
+On peut ensuite rajouter un texte pour expliquer l'erreur qui ne s'affiche que si l'erreur est à *true* 
+```jsx
+{error && <p>Veuillez écrire un minimun de 140 caractères</p>}
+```
+Enfin, il ne faut pas oublier de repasser l'erreur à false si jamais il n'y a pu d'erreur.
+```jsx
+axios.post("http://localhost:3003/articles", {
+    author: author,
+    content: content,
+    date: Date.now()
+}).then(() => {
+    setAuthor("");
+    setContent("");
+    setError(false)
+    getData();
+});
+```
+### Editer le texte
+
+
+
 
 
 
