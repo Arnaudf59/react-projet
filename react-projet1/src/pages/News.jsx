@@ -31,7 +31,7 @@ const News = () => {
             }).then(() => {
                 setAuthor("");
                 setContent("");
-                setError(false)
+                setError(false);
                 getData();
             });
         }   

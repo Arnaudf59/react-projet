@@ -1024,7 +1024,108 @@ axios.post("http://localhost:3003/articles", {
 });
 ```
 ### Editer le texte
+Dans le composant *Article*, on va devoir encore une fois créer une constante pour savoir si l'on à cliquer sur le bouton édition ou pas, et on va denouveau utiliser l'évement ``onClick`` pour modifier sa valeur lorsque l'on clique sur le bouton
+```jsx
+const [isEditing, setIsEditing] = useState(false);
+```
+```jsx
+<button onClick={() => setIsEditing(true)}>Modifier</button>
+```
+Après cela, il nous suffit de mettre une condition en fonction de la valeur de cette variable, pour permettre soit d'afficher le texte, soit de le rendre éditable.
+```jsx
+{isEditing ? (
+    <textarea autoFocus defaultValue={article.content}></textarea>
+) : (
+    <p>{article.content}</p>
+)}
+``` 
+Ensuite, il faut modifier notre bouton en fonction de cette même variable, soit pour éditer l'article, soit pour sauvegarder les modifications
+```jsx
+{isEditing ? (
+    <button onClick={handleEdit}>Valider</button>
+) : (
+    <button onClick={() => setIsEditing(true)}>Modifier</button>
+)}
+```
+La fonction ``handleEdit`` va nous permettre de sauvegarder les modification, ainsi que de modifier la valeur de ``isEditing``
+```jsx
+const handleEdit = () => {
 
+    const data = {
+        author: article.author,
+        content : "nouveau texte",
+        date: article.date
+    }
+
+    axios.put(`http://localhost:3003/articles/${article.id}`, data);
+    setIsEditing(false);
+}
+```
+Ici, on créer un objet data qui correspond a se que l'on envoie dans la base de données
+
+Ensuite, on utilise la methode ``put`` de ***axios*** pour l'envoyer
+
+**Attention:** La methode ``put`` a besoin de deux arguments pour fonctionner, l'idée du champs à modifier et l'objet data qui corresponds à notre modification
+
+Ensuite, il suffit de créer une constante pour récupérer la valeur du textarea et le mettre dans notre objet data, enfin, avec un *onChange* on va venir changer cette valeur
+```jsx
+const [editContent, setEditContent] = useState("");
+```
+```jsx
+<textarea onChange={(e) => setEditContent(e.target.value)} autoFocus defaultValue={article.content}></textarea>
+```
+```jsx
+const data = {
+    author: article.author,
+    content : editContent,
+    date: article.date
+}
+```
+Ensuite, il ne reste plus qu'a mettre à jour. Un composant enfant ne peut pas utiliser les fonctions de son parent. Du coup il y a deux autres méthodes, soit utiliser ``Redux``, soit en verifiant la variable modifier
+```jsx
+<p>{editContent ? editContent : article.content}</p>
+```
+***Attention:*** il faut aussi changer la ``defaultValue`` du textarea pour afficher la bonne valeur lors de la modification
+```jsx
+<textarea onChange={(e) => setEditContent(e.target.value)} autoFocus defaultValue={editContent ? editContent : article.content}></textarea>
+```
+### Supprimer un article
+Pour la suppression, on va pouvoir faire ça dans un nouveau composant car c'est plus facile à apprender que la ``modification``.
+```jsx
+import React, {Fragment} from 'react';
+
+const DeleteArticle = () => {
+    return (
+        <Fragment>
+            <h1>Delete</h1>
+        </Fragment>
+    );
+};
+
+export default DeleteArticle;
+```
+Et dans article, on va appeler ce nouveau composant. La seule donnée dont a besoin la fonction ``delete``, c'est l'id de l'élément à supprimer
+```jsx
+<DeleteArticle id={article.id}/>
+```
+Grace à cette ``props``, on peut recuperer l'id dans le composant delete
+```jsx
+const DeleteArticle = (id) => {}
+```
+Dans notre composant ``DeleteArticle``, on va maintenant créer notre bouton, sauf qu'avant de supprimer un objet, on va d'abords demmander confirmation à l'utilisateur, pour cela on va utiliser la fonction **``window.confirm()``**, si l'utilisateur clique sur le bouton ``ok``, alors on supprime notre donner
+```jsx
+<button onClick={() => {
+    if(window.confirm('Voulez vous supprimer cet article ?')) {
+        handleDelete();
+    }
+}}>Supprimer</button>
+```
+```jsx
+const handleDelete = () =>{
+    axios.delete(`http://localhost:3003/articles/${id}`);
+    window.location.reload();
+}
+```
 
 
 

@@ -1,0 +1,22 @@
+import React, {Fragment} from 'react';
+import axios from 'axios'
+
+const DeleteArticle = ({ id }) => {
+
+    const handleDelete = () =>{
+        axios.delete(`http://localhost:3003/articles/${id}`);
+        window.location.reload();
+    }
+
+    return (
+        <Fragment>
+            <button onClick={() => {
+                if(window.confirm('Voulez vous supprimer cet article ?')) {
+                    handleDelete();
+                }
+            }}>Supprimer</button>
+        </Fragment>
+    );
+};
+
+export default DeleteArticle;
